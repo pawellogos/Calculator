@@ -14,7 +14,7 @@ public class GUI extends JFrame implements ActionListener{
     JTextField input = new JTextField();
     JTextField output = new JTextField("output");
 
-    public static final String[] buttons = {"!","CE","C","back","1/x","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","+/-","0",".","="};
+    public static final String[] buttons = {"^","CO","C","back","!","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","","0",".","="};
     public GUI(){
         setTitle("Calculator");
         setSize(WIDTH,HEIGHT);
@@ -53,6 +53,7 @@ public class GUI extends JFrame implements ActionListener{
         String command = e.getActionCommand();
         switch (command) {
             case "C" -> input.setText("");
+            case "CO" -> output.setText("");
             case "back" -> {
                 String current_text = input.getText();
                 if(!input.getText().isEmpty()){
@@ -60,33 +61,54 @@ public class GUI extends JFrame implements ActionListener{
                 }
             }
             case "=" -> {
-                String[] parts = input.getText().split(" ");
-                BigDecimal a = new BigDecimal(parts[0]);
-                String operator = parts[1];
-                BigDecimal b = new BigDecimal(parts[2]);
+                String[] parts = input.getText().trim().split(" ");
 
-                BigDecimal result = switch(operator){
-                  case "+" -> logic.add(a,b);
-                  case "-" -> logic.subtract(a,b);
-                  case "*" -> logic.multiply(a,b);
-                  case "/" -> {
-                      if (b.equals(0)){
-                          String errormessage = "Invalid operation - Cant divide by 0";
-                          input.setText(errormessage);
-                          output.setText(errormessage);
-                      }
-                      yield logic.divide(a,b);
-                  }
-                    default -> throw new IllegalStateException("Unexpected value: " + operator);
-                };
-                output.setText("= " + String.valueOf(result));
+                try{
+                    BigDecimal a = new BigDecimal(parts[0]);
+                    String operator = parts[1];
+                    BigDecimal result = null;
+
+                    if(parts.length == 3){
+                        BigDecimal b = new BigDecimal(parts[2]);
+                        result = switch(operator){
+                            case "+" -> logic.add(a,b);
+                            case "-" -> logic.subtract(a,b);
+                            case "*" -> logic.multiply(a,b);
+                            case "/" -> {
+                                if (b.equals(0)){
+                                    String errormessage = "Invalid operation - Cant divide by 0";
+                                    input.setText(errormessage);
+                                    output.setText(errormessage);
+                                }
+                                yield logic.divide(a,b);
+                            }
+                            case "^" -> logic.power(a,b);
+
+                            default -> throw new IllegalStateException("Unexpected value: " + operator);
+                        };
+                        output.setText("= " + String.valueOf(result));
+                    } else if (parts.length == 2) {
+                        result = switch (operator){
+                            case "^2" -> logic.second_pow(a);
+                            case "^(1/2)" -> logic.sqrt_second(a);
+                            case "!" -> logic.factorial(a);
+                            default -> throw new IllegalStateException("Unexpected value: " + operator);
+                        };
+                        output.setText("= " + String.valueOf(result));
+                    }
+
+                }catch (NumberFormatException nfe) {
+                    nfe.printStackTrace();
+                }
             }
             case "." -> input.setText(input.getText() + command);
+            case "x^2" -> input.setText(input.getText() + " ^2");
+            case "sqrt(x)" -> input.setText(input.getText() + " ^(1/2)");
             default -> {
-                if (command.matches("\\d")){ //(0-9)
+                if (command.matches("\\d")){
                     input.setText(input.getText() + command);
                 }
-                if (command.matches("[+\\-*/!]")){
+                if (command.matches("[+\\-*/!^]")){
                     if (input.getText().isEmpty()){
                         input.setText("");
                     }else {
