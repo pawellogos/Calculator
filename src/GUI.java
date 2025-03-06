@@ -48,7 +48,14 @@ public class GUI extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
-            case "C" -> input.setText("test");
+            case "C" -> input.setText("");
+            case "back" -> {
+                String current_text = input.getText();
+                if(!input.getText().isEmpty()){
+                    input.setText(current_text.substring(0,current_text.length() - 1));
+                }
+
+            }
             //case "9" -> input.setText(input.getText() + "testttt");
             default -> {
                 if (command.matches("\\d")){ //(0-9)
