@@ -1,19 +1,17 @@
+import java.math.BigDecimal;
 
 public class CalculatorLogic {
 
-    public double add(double a, double b){
-        return a + b;
+    public BigDecimal add(BigDecimal a, BigDecimal b){
+        return a.add(b);
     }
-    public double subtract(double a, double b){
-        return a - b;
+    public BigDecimal subtract(BigDecimal a, BigDecimal b){
+        return a.subtract(b);
     }
-    public double multiply(double a, double b){
-        return a * b;
+    public BigDecimal multiply(BigDecimal a, BigDecimal b){
+        return a.multiply(b);
     }
-    public double divide(double a, double b){
-        if(b == 0){
-            //add Exception
-        }
-        return a / b;
+    public BigDecimal divide(BigDecimal a, BigDecimal b){
+        return a.divide(b);
     }
 }

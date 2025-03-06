@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.util.Arrays;
 
 
 public class GUI extends JFrame implements ActionListener{
@@ -10,9 +12,9 @@ public class GUI extends JFrame implements ActionListener{
     public static final int WIDTH = 350;
     public static final int HEIGHT = 400;
     JTextField input = new JTextField();
-    JTextField output = new JTextField();
+    JTextField output = new JTextField("output");
 
-    public static final String[] buttons = {"%","CE","C","back","1/x","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","+/-","0",".","="};
+    public static final String[] buttons = {"!","CE","C","back","1/x","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","+/-","0",".","="};
     public GUI(){
         setTitle("Calculator");
         setSize(WIDTH,HEIGHT);
@@ -28,7 +30,8 @@ public class GUI extends JFrame implements ActionListener{
         JPanel mid = new JPanel(new GridLayout(2,1));
         input.setEditable(false);
         output.setEditable(false);
-        mid.add(input,output);
+        mid.add(input);
+        mid.add(output);
 
         //Bottom section - buttons
         JPanel bottom = new JPanel(new GridLayout(6,4));
@@ -44,6 +47,7 @@ public class GUI extends JFrame implements ActionListener{
         add(bottom,BorderLayout.SOUTH);
         setVisible(true);
     }
+    //action logic for specific buttons
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
@@ -54,12 +58,40 @@ public class GUI extends JFrame implements ActionListener{
                 if(!input.getText().isEmpty()){
                     input.setText(current_text.substring(0,current_text.length() - 1));
                 }
-
             }
-            //case "9" -> input.setText(input.getText() + "testttt");
+            case "=" -> {
+                String[] parts = input.getText().split(" ");
+                BigDecimal a = new BigDecimal(parts[0]);
+                String operator = parts[1];
+                BigDecimal b = new BigDecimal(parts[2]);
+
+                BigDecimal result = switch(operator){
+                  case "+" -> logic.add(a,b);
+                  case "-" -> logic.subtract(a,b);
+                  case "*" -> logic.multiply(a,b);
+                  case "/" -> {
+                      if (b.equals(0)){
+                          String errormessage = "Invalid operation - Cant divide by 0";
+                          input.setText(errormessage);
+                          output.setText(errormessage);
+                      }
+                      yield logic.divide(a,b);
+                  }
+                    default -> throw new IllegalStateException("Unexpected value: " + operator);
+                };
+                output.setText("= " + String.valueOf(result));
+            }
+            case "." -> input.setText(input.getText() + command);
             default -> {
                 if (command.matches("\\d")){ //(0-9)
                     input.setText(input.getText() + command);
+                }
+                if (command.matches("[+\\-*/!]")){
+                    if (input.getText().isEmpty()){
+                        input.setText("");
+                    }else {
+                        input.setText(input.getText() + " " + command + " ");
+                    }
                 }
             }
         }
