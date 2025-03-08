@@ -14,7 +14,7 @@ public class GUI extends JFrame implements ActionListener{
     JTextField input = new JTextField();
     JTextField output = new JTextField("output");
 
-    public static final String[] buttons = {"^","CO","C","back","!","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","","0",".","="};
+    public static final String[] buttons = {"^","Ans","C","back","!","x^2","sqrt(x)","/","7","8","9","*","4","5","6","-","1","2","3","+","","0",".","="};
     public GUI(){
         setTitle("Calculator");
         setSize(WIDTH,HEIGHT);
@@ -53,7 +53,9 @@ public class GUI extends JFrame implements ActionListener{
         String command = e.getActionCommand();
         switch (command) {
             case "C" -> input.setText("");
-            case "CO" -> output.setText("");
+            case "Ans" -> {
+                input.setText(input.getText() + output.getText());
+            }
             case "back" -> {
                 String current_text = input.getText();
                 if(!input.getText().isEmpty()){
@@ -86,7 +88,7 @@ public class GUI extends JFrame implements ActionListener{
 
                             default -> throw new IllegalStateException("Unexpected value: " + operator);
                         };
-                        output.setText("= " + String.valueOf(result));
+                        output.setText(String.valueOf(result));
                     } else if (parts.length == 2) {
                         result = switch (operator){
                             case "^2" -> logic.second_pow(a);
